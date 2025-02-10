@@ -43,7 +43,7 @@ public class QRScanner : MonoBehaviour
     {
         using (HttpClient client = new HttpClient())
         {
-            var response = await client.PostAsync("https://your-auth-server.com/validate",
+            var response = await client.PostAsync("https://azure.myflow.com/validate",
                 new StringContent(jwtToken));
 
             if (response.IsSuccessStatusCode)
