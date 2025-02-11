@@ -3,12 +3,15 @@ using UnityEngine.UI;
 using ZXing;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 public class QRScanner : MonoBehaviour
 {
     public RawImage cameraView;
     private WebCamTexture webcamTexture; 
     private bool isScanning = true;
+    public string userId = "";
+    public string sessionId = "";
 
     void Start()
     {
@@ -43,12 +46,18 @@ public class QRScanner : MonoBehaviour
     {
         using (HttpClient client = new HttpClient())
         {
-            var response = await client.PostAsync("https://azure.myflow.com/validate",
+            var response = await client.PostAsync("https://azure.myflow.ch/validate",
                 new StringContent(jwtToken));
 
             if (response.IsSuccessStatusCode)
             {
                 Debug.Log("User authenticated!");
+                
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(jwtToken);
+            
+                userId = jwtToken.Claims.First(claim => claim.Type == "user_id").Value;
+                sessionId = jwtToken.Claims.First(claim => claim.Type == "session_id").Value;
             }
             else
             {
